@@ -178,7 +178,7 @@
 <div class="wrap">
   <header class="mast">
     <h1>나의 브루잉 레시피 북</h1>
-    <p id="sub">원두, 품종, 드리퍼, 로스팅, 취향으로 찾아보세요.</p>
+    <p id="sub">원두, 품종, 드리퍼, 필터, 로스팅, 취향으로 찾아보세요.</p>
     <div class="export" id="exportbar" hidden>
       <span id="exportmsg"></span>
       <button id="exportbtn">노트 복사</button>
@@ -188,7 +188,7 @@
   <div class="searchbar">
     <label class="search">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      <input id="q" type="search" placeholder="원두명, 품종, 컵노트, 드리퍼…" autocomplete="off" aria-label="레시피 검색">
+      <input id="q" type="search" placeholder="원두명, 품종, 컵노트, 드리퍼, 필터…" autocomplete="off" aria-label="레시피 검색">
       <button class="clear" id="qclear" hidden>지우기</button>
     </label>
     <div class="filters" id="filters"></div>
@@ -214,8 +214,9 @@
   const POS_NAME = {bright:"밝은 쪽", mid:"중간", dark:"어두운 쪽"};
   const OWNED_DRIPPERS = ["Hario Pegasus 01","Origami Air S","Hario NEO 02","UFO Dripper V3","Hario Switch 02",
     "Kalita Wave 155","Beandy Silk Dripper","Kalita 101D","AeroPress","Hario Drip Assist"];
+  const OWNED_FILTERS = ["Hario 01 콘 필터","Hario 02 콘 필터","HIFLUX Folding V02","Kalita Wave 155 필터","Kalita 101 필터","AeroPress 필터"];
 
-  const state = { recipes: [], notes: [], q: "", f: { bean:null, roastery:null, country:null, farm:null, variety:null, process:null, dripper:null, level:null, taste:null }, cmin:"", cmax:"", open:null, loaded:true };
+  const state = { recipes: [], notes: [], q: "", f: { bean:null, roastery:null, country:null, farm:null, variety:null, process:null, dripper:null, filter:null, level:null, taste:null }, cmin:"", cmax:"", open:null, loaded:true };
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const norm = (s) => String(s ?? "").toLowerCase().replace(/\s+/g, "");
@@ -231,15 +232,17 @@
     const farms = uniq(R.map(r => r.farm));
     const procs = uniq(R.map(r => r.process));
     const drips = uniq(R.flatMap(r => r.drippers || []));
+    const filts = uniq(R.map(r => r.filter));
     const row = (key, label, opts, unused = [], multi = false) => (opts.length || unused.length) ? `<div class="frow${multi ? " multi" : ""}" role="group" aria-label="${label}"><span class="lab">${label}</span>${multi ? '<div class="chips">' : ""}${
       opts.map(([v,t]) => `<button class="chip" data-k="${key}" data-v="${esc(v)}" aria-pressed="${state.f[key]===v}">${esc(t)}</button>`).join("")}${
-      unused.map(v => `<button class="chip" disabled title="아직 이 드리퍼로 저장된 레시피가 없어요">${esc(v)}</button>`).join("")}${multi ? "</div>" : ""}</div>` : "";
+      unused.map(v => `<button class="chip" disabled title="아직 저장된 레시피가 없어요">${esc(v)}</button>`).join("")}${multi ? "</div>" : ""}</div>` : "";
     const unusedDrips = OWNED_DRIPPERS.filter(d => !drips.includes(d));
     $("#filters").innerHTML =
       row("taste","취향",TASTES) +
       row("level","로스팅",LEVELS) +
       `<div class="frow"><span class="lab">색도</span><span class="range"><input id="cmin" inputmode="numeric" placeholder="최소" value="${esc(state.cmin)}" aria-label="색도 최소"><span>~</span><input id="cmax" inputmode="numeric" placeholder="최대" value="${esc(state.cmax)}" aria-label="색도 최대"></span><span class="msg">#숫자 (높을수록 밝음)</span></div>` +
       row("dripper","드리퍼",drips.map(d=>[d,d]), unusedDrips, true) +
+      row("filter","필터",filts.map(d=>[d,d]), OWNED_FILTERS.filter(d => !filts.includes(d)), true) +
       `<div class="fgroup">` +
       row("bean","원두",beans.map(d=>[d,d]), [], true) +
       row("roastery","로스터",roasters.map(d=>[d,d]), [], true) +
@@ -265,6 +268,7 @@
     if (f.farm && r.farm !== f.farm) return false;
     if (f.process && r.process !== f.process) return false;
     if (f.dripper && !(r.drippers||[]).includes(f.dripper)) return false;
+    if (f.filter && r.filter !== f.filter) return false;
     if (f.level && r.roastLevel !== f.level) return false;
     if (f.taste && r.intent !== f.taste) return false;
     const lo = parseFloat(state.cmin), hi = parseFloat(state.cmax);

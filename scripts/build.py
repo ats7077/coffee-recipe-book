@@ -15,7 +15,10 @@ NOTES = ROOT / "notes" / "notes.json"
 OUT = ROOT / "data.js"
 
 REQUIRED = ["id", "beanId", "beanName", "roastLevel", "rank", "intent", "title",
-            "drippers", "settings", "steps"]
+            "drippers", "filter", "settings", "steps"]
+# 필터 정식 이름 — index.html의 OWNED_FILTERS, SKILL.md의 필터 목록과 함께 고친다.
+FILTERS = {"Hario 01 콘 필터", "Hario 02 콘 필터", "HIFLUX Folding V02",
+           "Kalita Wave 155 필터", "Kalita 101 필터", "AeroPress 필터"}
 LEVELS = {"ultralight", "light", "medium", "dark"}
 INTENTS = {"tea-like", "clarity", "sweetness", "aroma"}
 POSITIONS = {"bright", "mid", "dark", ""}
@@ -40,6 +43,8 @@ def load_recipes():
             errors.append(f"{path.name}: intent는 {sorted(INTENTS)} 중 하나여야 해요")
         if r.get("roastPosition", "") not in POSITIONS:
             errors.append(f"{path.name}: roastPosition은 bright/mid/dark 중 하나여야 해요")
+        if r.get("filter") and r["filter"] not in FILTERS:
+            errors.append(f"{path.name}: filter는 정식 이름만 써요 {sorted(FILTERS)} (받은 값: {r['filter']!r})")
         cv = r.get("colorValue")
         if cv is not None and not isinstance(cv, (int, float)):
             errors.append(f"{path.name}: colorValue는 숫자 또는 null이어야 해요")

@@ -65,6 +65,41 @@ UFO + standard base / UFO + Switch base / Switch 02.
 장비 특성 중 확인되지 않은 부분(NEO·UFO의 세부 구조 등)은 레시피 근거로
 과장하지 않고, 사용자의 실제 드로다운 피드백이 생기면 그 값을 우선한다.
 
+### Filters — 필터도 레시피 변수다
+
+같은 드리퍼라도 필터에 따라 배출 속도가 달라지므로, **필터는 드리퍼와 별개의
+레시피 구분자**로 다룬다. 드리퍼 제조사의 순정 필터가 기본값이고, 필터 전문
+제조사의 필터는 흐름 특성을 보고 의도적으로 고른다.
+
+| 필터 (정식 이름) | 맞는 드리퍼 | 흐름 특성 | 잘 맞는 방향 |
+|---|---|---|---|
+| `Hario 01 콘 필터` | Pegasus 01, Origami Air S | 기준(순정) | 드리퍼 기본 특성 그대로 |
+| `Hario 02 콘 필터` | NEO 02, Switch 02, UFO V3 | 기준(순정) | 드리퍼 기본 특성 그대로 |
+| `HIFLUX Folding V02` | 02 콘 필터를 쓰는 드리퍼 (NEO 02, Switch 02 등) | **Fast** — 순정보다 배출이 빠름 | 클래리티, 티라이크, 곱게 갈아야 하는 밝은 로스트 |
+| `Kalita Wave 155 필터` | Kalita Wave 155, 빈디 실크, Origami Air S(웨이브) | 기준(순정), 평평한 베드 | 단맛·밸런스 |
+| `Kalita 101 필터` | Kalita 101D | 기준(순정), 느린 배출 | 바디·단맛 |
+| `AeroPress 필터` | AeroPress | 가압 배출 | 추출 보강 |
+
+Fast 필터(HIFLUX Folding V02)를 쓸 때의 설계 규칙:
+- 같은 분쇄도면 드로다운이 짧아져 접촉시간·추출률이 떨어진다. 순정 필터 레시피를
+  그대로 옮기지 말고 **분쇄를 1클릭 곱게(RC 2) 하거나 푸어를 한 번 더 나누고,
+  목표 시간을 15~25초 짧게** 잡는 데서 시작한다.
+- 곱게 갈아도 막히지 않는 것이 장점이므로, 저추출 위험이 큰 울트라 라이트·밝은
+  라이트의 Clarity / Tea-like에 우선 고려한다. 미디엄~다크의 쓴맛·떫음 억제에도
+  쓸 수 있다(굵게 + 빠른 배출).
+- 단맛·질감이 목적인 레시피(플랫, 침지 비중 높은 하이브리드)에는 순정 필터를
+  기본으로 둔다. Switch 침지 구간은 밸브가 시간을 정하므로 Fast 필터의 영향은
+  밸브를 연 뒤의 드로다운에만 나타난다.
+- 실제 속도 차이는 측정값이 없으므로 수치를 단정하지 않는다. 첫 추출의 드로다운
+  시간을 확인하도록 안내하고, 브루 노트에 피드백이 쌓이면 그 값을 우선한다.
+- 순정이 아닌 필터를 골랐다면 추출 의도에 **왜 이 필터인지, 그 때문에
+  분쇄·시간을 어떻게 바꿨는지** 한 줄을 반드시 적는다.
+- 같은 원두의 세 레시피는 드리퍼뿐 아니라 필터로도 차별화할 수 있다(같은
+  드리퍼 + 다른 필터도 서로 다른 레시피로 인정).
+
+사용자가 새 필터를 알려 주면 이 표, `scripts/build.py`의 `FILTERS`, 레시피 북
+`index.html`의 `OWNED_FILTERS`를 함께 고친다.
+
 ---
 
 ## Step 1 — Extract bean information
@@ -318,7 +353,7 @@ UFO + standard base / UFO + Switch base / Switch 02.
 ### 1. 헤더
 - 로스터리 · 원두명 · 레시피 번호/이름 (예: Recipe 1 — Tea-like / Aromatic)
   — 번호는 Step 4-3 추천 순서
-- 사용 드리퍼(및 Drip Assist 등 액세서리)를 태그처럼 표기
+- 사용 드리퍼·필터(및 Drip Assist 등 액세서리)를 태그처럼 표기
 - **추천 순위 배지("추천 1순위") + 추천 이유 한 줄**
 
 ### 2. 원두 정보
@@ -483,7 +518,10 @@ Samsung Notes에 가져오기 좋은 문서 형태로 만든다.
 - `drippers` 값은 레시피 북 필터와 맞도록 다음 정식 이름만 쓴다:
   `Hario Pegasus 01`, `Origami Air S`, `Hario NEO 02`, `UFO Dripper V3`,
   `Hario Switch 02`, `Kalita Wave 155`, `Beandy Silk Dripper`, `Kalita 101D`,
-  `AeroPress`, `Hario Drip Assist`. 필터 종류는 `filter` 필드에 따로 적는다.
+  `AeroPress`, `Hario Drip Assist`.
+- `filter` 값도 레시피 북의 필터 칩과 맞도록 "Filters" 표의 정식 이름만 쓴다
+  (예: `Hario 02 콘 필터`, `HIFLUX Folding V02`). 린싱·주름 유지 같은 운용 메모는
+  `filter`가 아니라 `equipment`의 필터 행에 적는다. 정식 이름이 아니면 빌드가 실패한다.
   새 장비가 생기면 이 목록과 레시피 북 `index.html`의 `OWNED_DRIPPERS`를 함께 고친다.
 - `country`, `farm`, `variety`, `process`, `roastery`는 표기를 통일한다
   (예: 항상 `Peru`, `Washed`, `Geisha`). 기존 `recipes/`의 표기를 먼저 확인하고 따른다.
@@ -521,7 +559,7 @@ Samsung Notes에 가져오기 좋은 문서 형태로 만든다.
 
 - `steps[].t`는 타이머가 읽을 수 있게 `mm:ss`로 시작한다(범위는 `02:45~03:05`,
   시각이 없는 단계는 "추출 후" 등 자유 텍스트).
-- 검색은 beanName·variety·drippers·roastLevel·colorValue·intent·cupNotes 등
+- 검색은 beanName·variety·drippers·filter·roastLevel·colorValue·intent·cupNotes 등
   필드 기준이므로 빈 값 없이 채운다. 확인되지 않은 값은 빈 문자열로 둔다.
 
 ### 브루 노트 활용

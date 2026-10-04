@@ -21,4 +21,6 @@
    성공하면 커밋하고 바로 push한다(사용자가 "항상 push"로 지정 — 확인받지 않는다).
 4. 사용자가 레시피 북의 "노트 복사" 내용을 붙여 넣으면 `notes/notes.json`에
    중복 id를 건너뛰며 추가한 뒤 build → 커밋 → push.
-5. `index.html`을 고치면 휴대폰 폭(390px)에서 깨지지 않는지 확인한다.
+5. 드리퍼·필터 정식 이름 목록은 `SKILL.md`, `scripts/build.py`(`FILTERS`),
+   `index.html`(`OWNED_DRIPPERS`, `OWNED_FILTERS`) 세 곳에 있다. 장비가 늘면 함께 고친다.
+6. `index.html`을 고치면 휴대폰 폭(390px)에서 깨지지 않는지 확인한다.
