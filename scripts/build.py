@@ -18,6 +18,7 @@ REQUIRED = ["id", "beanId", "beanName", "roastLevel", "rank", "intent", "title",
             "drippers", "filter", "settings", "steps"]
 # 필터 정식 이름 — index.html의 OWNED_FILTERS, SKILL.md의 필터 목록과 함께 고친다.
 FILTERS = {"Hario 01 콘 필터", "Hario 02 콘 필터", "HIFLUX Folding V02",
+           "UFO 전용 필터 Standard", "UFO 전용 필터 Fast",
            "Kalita Wave 155 필터", "Kalita 101 필터", "AeroPress 필터"}
 LEVELS = {"ultralight", "light", "medium", "dark"}
 INTENTS = {"tea-like", "clarity", "sweetness", "aroma"}
