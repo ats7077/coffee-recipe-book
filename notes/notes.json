@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "e2e-test-1",
+    "recipeId": "peru-el-cerro-geisha-lot1_r1",
+    "rating": 3,
+    "memo": "전송 경로 확인용 (곧 삭제)",
+    "date": "2026-10-05 00:00"
+  }
+]
