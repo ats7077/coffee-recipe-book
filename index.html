@@ -168,9 +168,11 @@
   .note .nh { color: var(--faint); font-size: 12.5px; }
   .note .nh .s { color: var(--crema); letter-spacing: 1px; }
   .msg { font-size: 13px; color: var(--faint); }
-  .export { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--crema-soft); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; }
+  .export { margin-top: 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; background: var(--crema-soft); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; }
   .export[hidden] { display: none; }
   .export button { border: 0; background: var(--crema); color: var(--bg); border-radius: 8px; padding: 8px 12px; font-weight: 700; flex: none; }
+  .export .exbtns { display: flex; gap: 6px; }
+  .export button.sub { background: none; color: var(--crema); border: 1px solid var(--crema); }
   .note .pending { color: var(--sweet); font-weight: 700; margin-left: 6px; }
   .del { margin-top: 36px; border: 0; background: none; color: var(--faint); font-size: 13px; text-decoration: underline; padding: 4px 0; }
 
@@ -187,7 +189,7 @@
     <p id="sub">원두, 품종, 드리퍼, 필터, 로스팅, 취향으로 찾아보세요.</p>
     <div class="export" id="exportbar" hidden>
       <span id="exportmsg"></span>
-      <button id="exportbtn">노트 복사</button>
+      <span class="exbtns"><button id="sendbtn">GitHub로 보내기</button><button id="exportbtn" class="sub">노트 복사</button></span>
     </div>
   </header>
 
@@ -484,8 +486,9 @@
     if (!savePending(p)) { $("#nmsg").textContent = "이 브라우저에서는 노트를 저장할 수 없어요. 메모를 Claude Code에 직접 알려 주세요."; return; }
     $("#nmemo").value = ""; rating = 0;
     $("#stars").querySelectorAll("button").forEach(x => x.classList.remove("on"));
-    $("#nmsg").textContent = "이 기기에 저장했어요. 위쪽 '노트 복사'로 Claude Code에 전달하면 레시피 북에 반영돼요.";
+    $("#nmsg").textContent = "이 기기에 저장했어요. 열린 GitHub 화면에서 Submit을 누르면 모든 기기에 반영돼요.";
     renderNotes(); renderList(); renderExport();
+    sendPending();
   }
 
   /* ---------- search input ---------- */
@@ -505,8 +508,18 @@
   function renderExport() {
     const p = loadPending();
     $("#exportbar").hidden = !p.length;
-    $("#exportmsg").textContent = `Claude Code에 아직 전달하지 않은 노트 ${p.length}개`;
+    $("#exportmsg").textContent = `아직 보내지 않은 노트 ${p.length}개`;
   }
+  // 대기 중인 노트를 본문에 담은 GitHub 이슈 작성 화면을 연다. Submit하면
+  // .github/workflows/brew-note.yml이 notes/notes.json에 반영한다. 저장소를 옮기면 REPO를 고친다.
+  const REPO = "ats7077/coffee-recipe-book";
+  function sendPending() {
+    const p = loadPending(); if (!p.length) return;
+    const body = "```json" + "\n" + JSON.stringify(p, null, 2) + "\n" + "```";
+    window.open(`https://github.com/${REPO}/issues/new?title=${encodeURIComponent("brew-note " + p[p.length-1].date)}&body=${encodeURIComponent(body)}`, "_blank", "noopener");
+    $("#exportmsg").textContent = "GitHub에서 Submit을 누르면 1~2분 뒤 반영돼요.";
+  }
+  $("#sendbtn").addEventListener("click", sendPending);
   $("#exportbtn").addEventListener("click", async () => {
     const text = "브루 노트를 notes/notes.json에 추가해줘:\n" + JSON.stringify(loadPending(), null, 2);
     try { await navigator.clipboard.writeText(text); $("#exportmsg").textContent = "복사했어요. Claude Code에 붙여 넣으세요."; }

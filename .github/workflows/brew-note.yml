@@ -1,0 +1,40 @@
+# 레시피 북의 "GitHub로 보내기"가 만든 이슈(제목 brew-note …)를 notes/notes.json에 반영한다.
+# 저장소 주인이 연 이슈만 처리한다 (Public 저장소라 남도 이슈를 열 수 있음).
+name: brew-note
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: write
+  issues: write
+  pages: write
+concurrency: brew-note
+defaults:
+  run:
+    shell: bash
+jobs:
+  add:
+    if: github.event.issue.user.login == github.repository_owner && startsWith(github.event.issue.title, 'brew-note')
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+      BODY: ${{ github.event.issue.body }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 노트 추가 · 빌드 · 커밋
+        run: |
+          printf '%s' "$BODY" | python3 scripts/add_notes.py | tee "$RUNNER_TEMP/result.txt"
+          python3 scripts/build.py
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -qam "notes: 브루 노트 반영 (#$ISSUE)"
+            git push
+            # GITHUB_TOKEN으로 한 push가 Pages 빌드를 안 깨울 때를 대비
+            gh api -X POST "repos/$GITHUB_REPOSITORY/pages/builds" >/dev/null || true
+          fi
+          gh issue close "$ISSUE" --comment "$(cat "$RUNNER_TEMP/result.txt") — 1~2분 뒤 레시피 북에 반영돼요."
+      - name: 실패 알림
+        if: failure()
+        run: gh issue comment "$ISSUE" --body "노트를 반영하지 못했어요. 로그 - $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
