@@ -508,15 +508,20 @@ Samsung Notes에 가져오기 좋은 문서 형태로 만든다.
 그다음 build → 커밋 → push. 사용자가 말로 남긴 노트도 같은 형식
 `{id, recipeId, rating, memo, date}`로 추가한다(id는 `YYYYMMDD-HHMM-<recipeId 일부>` 등 고유 값).
 
-### B. claude.ai (Artifact 도구가 있을 때)
+### B. claude.ai · Claude 앱 일반 채팅 (저장소에 접근할 수 없을 때)
 
-- 레시피 북 링크: https://claude.ai/artifact/RfNWocyDKB2ZYJ7SbYcuKD
-  (Artifact `list`로 제목 "나의 브루잉 레시피 북"을 찾을 수도 있음)
-- Artifact `write_db`, `db_op: "batch"`, collection `recipes`, 레시피당 문서 1개.
-  문서 JSON은 컨테이너 파일로 만든 뒤 `file_path`로 넘긴다. doc_id 규칙은 아래와 같다.
-- Claude Code로 옮긴 뒤에는 이 레시피 북이 최신이 아닐 수 있다. 사용자가 어느 쪽을
-  쓰는지 모르면 한 번 묻고, Claude Code 저장소를 쓴다고 하면 레시피 JSON 파일을
-  제시해 저장소의 `recipes/`에 넣도록 안내한다.
+사용자의 레시피 북은 GitHub 저장소 `ats7077/coffee-recipe-book`이고
+https://ats7077.github.io/coffee-recipe-book/ 로 배포된다. 일반 채팅에서는 저장소에
+쓸 수 없으므로:
+
+- 레시피는 대화에 그대로 보여 주고, 아래 스키마의 **레시피 JSON을 레시피당 파일 1개**
+  (`<id>.json`)로 만들어 내려받을 수 있게 한다. "Claude Code에서 이 파일들을 `recipes/`에
+  넣고 빌드해 달라고 하면 레시피 북에 올라간다"고 한 줄로 안내한다.
+- 브루 노트와 기존 레시피를 읽을 수 없으므로, 같은 원두·로스터리의 이전 피드백이
+  있으면 알려 달라고 한 번 묻는다(없다고 하면 기준값으로 설계).
+- 예전 Artifact 레시피 북(https://claude.ai/artifact/RfNWocyDKB2ZYJ7SbYcuKD)은 더 이상
+  기본 저장 위치가 아니다. 사용자가 그쪽에 넣어 달라고 할 때만 Artifact `write_db`
+  (`db_op: "batch"`, collection `recipes`, 레시피당 문서 1개)로 저장한다.
 
 ### 공통 규칙
 
