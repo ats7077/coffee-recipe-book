@@ -173,6 +173,8 @@
   .export button { border: 0; background: var(--crema); color: var(--bg); border-radius: 8px; padding: 8px 12px; font-weight: 700; flex: none; }
   .export .exbtns { display: flex; gap: 6px; }
   .export button.sub { background: none; color: var(--crema); border: 1px solid var(--crema); }
+  .note .nact { float: right; }
+  .note .nact button { border: 0; background: none; color: var(--faint); font-size: 12.5px; text-decoration: underline; padding: 2px 4px; }
   .note .pending { color: var(--sweet); font-weight: 700; margin-left: 6px; }
   .del { margin-top: 36px; border: 0; background: none; color: var(--faint); font-size: 13px; text-decoration: underline; padding: 4px 0; }
 
@@ -346,7 +348,7 @@
     list.querySelectorAll(".rrow").forEach(el => el.addEventListener("click", () => openDetail(el.dataset.id)));
   }
   function noteSummary(id) {
-    const ns = state.notes.filter(n => n.recipeId === id);
+    const ns = allNotes().filter(n => n.recipeId === id);
     if (!ns.length) return "";
     const avg = ns.reduce((s,n)=>s+(n.rating||0),0)/ns.length;
     return `<span>★ ${avg.toFixed(1)} (${ns.length}회)</span>`;
@@ -423,7 +425,7 @@
       <div class="dsec"><h3>브루 노트</h3>
         <div class="note-form" id="nform">
           <div class="stars" id="stars" role="radiogroup" aria-label="평점">${[1,2,3,4,5].map(n=>`<button data-n="${n}" aria-label="${n}점">★</button>`).join("")}</div>
-          <textarea id="nmemo" placeholder="맛, 바꾼 점, 다음에 시도할 것 (예: RC 47로 한 클릭 곱게 → 단맛 좋아짐)"></textarea>
+          <textarea id="nmemo" maxlength="2000" placeholder="맛, 바꾼 점, 다음에 시도할 것 (예: RC 47로 한 클릭 곱게 → 단맛 좋아짐)"></textarea>
           <button class="save" id="nsave">노트 저장</button>
           <span class="msg" id="nmsg"></span>
         </div>
@@ -435,14 +437,34 @@
     renderNotes();
   }
 
-  let rating = 0;
+  let rating = 0, editing = null; // editing: 수정 중인 노트
+  function paintStars() { $("#stars").querySelectorAll("button").forEach(x => x.classList.toggle("on", +x.dataset.n <= rating)); }
   function bindDetail(r) {
-    rating = 0;
+    rating = 0; editing = null;
+    $("#nlist").addEventListener("click", e => {
+      const b = e.target.closest("button[data-act]"); if (!b) return;
+      const n = allNotes().find(x => x.id === b.dataset.id); if (!n) return;
+      if (b.dataset.act === "edit") {
+        editing = n; rating = n.rating || 0; paintStars();
+        $("#nmemo").value = n.memo || ""; $("#nsave").textContent = "수정 저장";
+        $("#nmsg").textContent = "노트를 고친 뒤 '수정 저장'을 누르세요.";
+        $("#nform").scrollIntoView({ block: "center" });
+        return;
+      }
+      if (!confirm("이 노트를 삭제할까요?")) return;
+      const onServer = state.notes.some(x => x.id === n.id);
+      const p = loadPending().filter(x => x.id !== n.id);
+      if (onServer) p.push({ id: n.id, recipeId: n.recipeId, deleted: true });
+      savePending(p);
+      if (editing && editing.id === n.id) { editing = null; $("#nsave").textContent = "노트 저장"; }
+      $("#nmsg").textContent = onServer ? "삭제했어요. 열린 GitHub 화면에서 Submit을 누르면 모든 기기에 반영돼요." : "삭제했어요.";
+      renderNotes(); renderList(); renderExport();
+      if (onServer) sendPending();
+    });
     $("#tgo").addEventListener("click", () => timer ? stopTimer(false) : startTimer());
     $("#treset").addEventListener("click", () => stopTimer(true));
     $("#stars").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
-      rating = +b.dataset.n;
-      $("#stars").querySelectorAll("button").forEach(x => x.classList.toggle("on", +x.dataset.n <= rating));
+      rating = +b.dataset.n; paintStars();
     }));
     $("#nsave").addEventListener("click", saveNote);
   }
@@ -473,7 +495,7 @@
   function renderNotes() {
     const el = $("#nlist"); if (!el || !state.open) return;
     const ns = allNotes().filter(n => n.recipeId === state.open).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-    el.innerHTML = ns.length ? ns.map(n => `<div class="note"><div class="nh"><span class="s">${"★".repeat(n.rating||0)}${"☆".repeat(5-(n.rating||0))}</span> ${esc(n.date)}${n._pending ? `<span class="pending">이 기기에만 저장됨</span>` : ""}</div><div>${esc(n.memo)}</div></div>`).join("")
+    el.innerHTML = ns.length ? ns.map(n => `<div class="note"><div class="nh"><span class="s">${"★".repeat(n.rating||0)}${"☆".repeat(5-(n.rating||0))}</span> ${esc(n.date)}${n._pending ? `<span class="pending">이 기기에만 저장됨</span>` : ""}<span class="nact"><button data-act="edit" data-id="${esc(n.id)}">수정</button><button data-act="del" data-id="${esc(n.id)}">삭제</button></span></div><div>${esc(n.memo)}</div></div>`).join("")
       : `<p class="msg" style="margin-top:12px">아직 기록이 없어요. 내려 마신 뒤 평점과 메모를 남겨 두면, 다음 레시피를 만들 때 Claude가 참고할 수 있어요.</p>`;
   }
   async function saveNote() {
@@ -482,10 +504,11 @@
     const d = new Date();
     const date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
     const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
-    const p = loadPending(); p.push({ id, recipeId: state.open, rating, memo, date });
+    const base = editing || { id, recipeId: state.open, date };
+    const p = loadPending().filter(n => n.id !== base.id); p.push({ id: base.id, recipeId: base.recipeId, rating, memo, date: base.date });
     if (!savePending(p)) { $("#nmsg").textContent = "이 브라우저에서는 노트를 저장할 수 없어요. 메모를 Claude Code에 직접 알려 주세요."; return; }
-    $("#nmemo").value = ""; rating = 0;
-    $("#stars").querySelectorAll("button").forEach(x => x.classList.remove("on"));
+    $("#nmemo").value = ""; rating = 0; editing = null; paintStars();
+    $("#nsave").textContent = "노트 저장";
     $("#nmsg").textContent = "이 기기에 저장했어요. 열린 GitHub 화면에서 Submit을 누르면 모든 기기에 반영돼요.";
     renderNotes(); renderList(); renderExport();
     sendPending();
@@ -504,11 +527,15 @@
   const PKEY = "coffee-recipe-book:pending-notes";
   function loadPending() { try { return JSON.parse(localStorage.getItem(PKEY) || "[]"); } catch (_) { return []; } }
   function savePending(arr) { try { localStorage.setItem(PKEY, JSON.stringify(arr)); return true; } catch (_) { return false; } }
-  function allNotes() { return [...state.notes, ...loadPending().map(n => ({ ...n, _pending: true }))]; }
+  function allNotes() {
+    const m = new Map(state.notes.map(n => [n.id, n]));
+    loadPending().forEach(n => n.deleted ? m.delete(n.id) : m.set(n.id, { ...n, _pending: true }));
+    return [...m.values()];
+  }
   function renderExport() {
     const p = loadPending();
     $("#exportbar").hidden = !p.length;
-    $("#exportmsg").textContent = `아직 보내지 않은 노트 ${p.length}개`;
+    $("#exportmsg").textContent = `아직 보내지 않은 노트 변경 ${p.length}건`;
   }
   // 대기 중인 노트를 본문에 담은 GitHub 이슈 작성 화면을 연다. Submit하면
   // .github/workflows/brew-note.yml이 notes/notes.json에 반영한다. 저장소를 옮기면 REPO를 고친다.
@@ -516,12 +543,12 @@
   function sendPending() {
     const p = loadPending(); if (!p.length) return;
     const body = "```json" + "\n" + JSON.stringify(p, null, 2) + "\n" + "```";
-    window.open(`https://github.com/${REPO}/issues/new?title=${encodeURIComponent("brew-note " + p[p.length-1].date)}&body=${encodeURIComponent(body)}`, "_blank", "noopener");
+    window.open(`https://github.com/${REPO}/issues/new?title=${encodeURIComponent("brew-note " + p.length + "건")}&body=${encodeURIComponent(body)}`, "_blank", "noopener");
     $("#exportmsg").textContent = "GitHub에서 Submit을 누르면 1~2분 뒤 반영돼요.";
   }
   $("#sendbtn").addEventListener("click", sendPending);
   $("#exportbtn").addEventListener("click", async () => {
-    const text = "브루 노트를 notes/notes.json에 추가해줘:\n" + JSON.stringify(loadPending(), null, 2);
+    const text = "브루 노트 변경을 notes/notes.json에 반영해줘:\n" + JSON.stringify(loadPending(), null, 2);
     try { await navigator.clipboard.writeText(text); $("#exportmsg").textContent = "복사했어요. Claude Code에 붙여 넣으세요."; }
     catch (_) {
       const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
@@ -533,9 +560,12 @@
 
   state.recipes = Array.isArray(window.RECIPES) ? window.RECIPES : [];
   state.notes = Array.isArray(window.NOTES) ? window.NOTES : [];
-  // 이미 notes.json에 반영된 노트는 이 기기의 대기 목록에서 지운다
-  const merged = new Set(state.notes.map(n => n.id));
-  savePending(loadPending().filter(n => !merged.has(n.id)));
+  // 이미 notes.json에 반영된 변경(추가·수정·삭제)은 이 기기의 대기 목록에서 지운다
+  const merged = new Map(state.notes.map(n => [n.id, n]));
+  savePending(loadPending().filter(n => {
+    const m = merged.get(n.id);
+    return n.deleted ? !!m : !(m && m.rating === n.rating && m.memo === n.memo);
+  }));
   renderFilters(); renderList(); renderExport();
 })();
 </script>

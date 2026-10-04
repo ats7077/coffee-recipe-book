@@ -9,7 +9,7 @@
   `.claude/skills/coffee-brewing-recipe-builder/SKILL.md`의 Step 7을 따른다.
 - `notes/notes.json` — 브루 노트 배열 `{id, recipeId, rating, memo, date}`.
 - `scripts/build.py` — recipes/, notes/를 검증하고 `data.js`를 만든다.
-- `scripts/add_notes.py` — 표준 입력의 노트 JSON을 `notes/notes.json`에 중복 없이 추가한다.
+- `scripts/add_notes.py` — 표준 입력의 노트 JSON(추가·수정·삭제)을 `notes/notes.json`에 반영한다.
 - `data.js` — 자동 생성. 직접 고치지 않는다.
 - `index.html` — 레시피 북 화면(검색·필터·타이머·노트). 외부 서버 없이 `data.js`만 읽는다.
 
