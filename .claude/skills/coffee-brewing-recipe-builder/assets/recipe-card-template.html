@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해월로스터리 에티오피아 74158 — Recipe 1</title>
+<style>
+  :root {
+    --bg: #17120e;
+    --bg-panel: #1f1811;
+    --bg-panel-2: #241c14;
+    --line: #362b1f;
+    --text: #ede3d3;
+    --text-dim: #a89880;
+    --text-faint: #7a6c58;
+    --gold: #e0a458;
+    --gold-soft: #c98f47;
+    --amber: #d97b3f;
+    --teal: #4fa88a;
+    --red: #c96b4a;
+    --violet: #9b87b0;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #17120e;
+      --bg-panel: #1f1811;
+      --bg-panel-2: #241c14;
+      --line: #362b1f;
+      --text: #ede3d3;
+      --text-dim: #a89880;
+      --text-faint: #7a6c58;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", sans-serif;
+    line-height: 1.55;
+    padding: 0 0 48px;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 28px 20px 0; }
+
+  /* Header */
+  .eyebrow { color: var(--text-faint); font-size: 13px; margin-bottom: 6px; }
+  h1 { font-size: 26px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; color: var(--text); }
+  h1 .sub { display:block; font-size: 16px; font-weight: 400; color: var(--gold); margin-top: 6px; }
+  .recipe-tag { display:inline-block; margin-top: 14px; font-size: 13px; color: var(--bg); background: var(--gold); padding: 4px 12px; border-radius: 3px; font-weight: 600; }
+
+  section { margin-top: 34px; }
+  h2 { font-size: 15px; color: var(--text-dim); font-weight: 600; margin: 0 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+
+  /* Bean info */
+  .bean-grid { display: grid; grid-template-columns: 100px 1fr; row-gap: 9px; column-gap: 12px; font-size: 14.5px; }
+  .bean-grid dt { color: var(--text-faint); }
+  .bean-grid dd { margin: 0; color: var(--text); }
+  .bars { display:flex; gap: 18px; margin-top: 14px; flex-wrap: wrap; }
+  .bar-item { font-size: 13px; color: var(--text-dim); }
+  .bar-item .dots { letter-spacing: 2px; color: var(--gold); }
+  .bar-item .dots .off { color: var(--line); }
+
+  /* Tags */
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+  .tag { font-size: 13px; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--line); color: var(--text-dim); }
+  .tag.a { border-color: var(--gold-soft); color: var(--gold); }
+  .tag.b { border-color: var(--teal); color: var(--teal); }
+  .tag.c { border-color: var(--violet); color: var(--violet); }
+
+  .philosophy { margin-top: 16px; font-size: 14.5px; color: var(--text); background: var(--bg-panel); border-left: 3px solid var(--gold); padding: 12px 14px; border-radius: 0 4px 4px 0; }
+
+  /* Degassing box */
+  .degas-box { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; margin-top: 14px; }
+  .degas-row { display:flex; justify-content: space-between; font-size: 14px; padding: 5px 0; }
+  .degas-row .k { color: var(--text-faint); }
+  .degas-row .v { color: var(--text); font-weight: 600; }
+  .degas-status { display:inline-block; margin-top: 4px; font-size: 12.5px; padding: 3px 9px; border-radius: 20px; background: rgba(224,164,88,0.15); color: var(--gold); }
+
+  /* Basic settings table */
+  table.settings { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  table.settings td { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  table.settings td:first-child { color: var(--text-faint); width: 40%; }
+  table.settings td:last-child { color: var(--text); font-weight: 600; text-align: right; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 26px; }
+  .timeline::before { content:""; position:absolute; left: 6px; top: 6px; bottom: 6px; width: 1px; background: var(--line); }
+  .t-step { position: relative; margin-bottom: 22px; }
+  .t-step:last-child { margin-bottom: 0; }
+  .t-dot { position:absolute; left: -26px; top: 3px; width: 11px; height: 11px; border-radius: 50%; background: var(--bg); border: 2px solid var(--gold); }
+  .t-time { font-size: 13px; color: var(--text-faint); margin-bottom: 4px; }
+  .t-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .t-badge { display:inline-block; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
+  .t-badge.pour { background: var(--amber); color: #1a1410; }
+  .t-note { font-size: 13px; color: var(--text-dim); margin-top: 4px; }
+  .t-progress { margin-top: 8px; height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; }
+  .t-progress-fill { height: 100%; background: var(--gold); border-radius: 4px; }
+  .t-cumulative { font-size: 12.5px; color: var(--text-faint); margin-top: 4px; text-align: right; }
+
+  .caution-box { margin-top: 20px; background: var(--bg-panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; font-size: 13.5px; color: var(--text-dim); }
+  .caution-box b { color: var(--text); }
+  .caution-box ul { margin: 6px 0 0; padding-left: 18px; }
+  .caution-box li { margin-bottom: 6px; }
+
+  /* Grind reference */
+  .grind-box { background: var(--bg-panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px; }
+  .grind-name { font-size: 13px; color: var(--text-dim); margin-bottom: 10px; }
+  .grind-scale { display:flex; justify-content: space-between; align-items: flex-end; }
+  .grind-num { text-align:center; flex:1; }
+  .grind-num .n { font-size: 22px; font-weight: 700; }
+  .grind-num .n.lo { color: var(--red); }
+  .grind-num .n.mid { color: var(--text); font-size: 26px; }
+  .grind-num .n.hi { color: var(--teal); }
+  .grind-num .lab { font-size: 11.5px; color: var(--text-faint); margin-top: 4px; line-height: 1.3; }
+  .grind-track { height: 4px; background: linear-gradient(90deg, var(--red), var(--text-dim), var(--teal)); border-radius: 4px; margin: 10px 0 4px; }
+
+  /* Intent list */
+  ul.intent { margin: 0; padding-left: 18px; font-size: 14.5px; }
+  ul.intent li { margin-bottom: 10px; color: var(--text-dim); }
+  ul.intent li b { color: var(--text); font-weight: 600; }
+
+  /* Sensory */
+  .sensory-grid { display: grid; gap: 10px; }
+  .sensory-item { display:flex; gap: 14px; align-items: baseline; background: var(--bg-panel); border-radius: 6px; padding: 12px 14px; }
+  .sensory-item .temp { font-size: 12.5px; font-weight: 700; color: var(--gold); min-width: 66px; }
+  .sensory-item .desc { font-size: 14px; color: var(--text-dim); }
+
+  /* Adjustment guide */
+  .adj-row { display:flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .adj-row:last-child { border-bottom: none; }
+  .adj-symptom { color: var(--red); min-width: 150px; flex-shrink:0; font-weight: 600; }
+  .adj-fix { color: var(--text-dim); }
+
+  /* Success criteria */
+  .success-box { background: linear-gradient(135deg, rgba(224,164,88,0.12), rgba(224,164,88,0.03)); border: 1px solid var(--gold-soft); border-radius: 6px; padding: 16px; font-size: 14.5px; color: var(--text); }
+
+  footer { text-align:center; margin-top: 40px; font-size: 12px; color: var(--text-faint); }
+
+  @media (max-width: 420px) {
+    h1 { font-size: 22px; }
+    .bean-grid { grid-template-columns: 84px 1fr; font-size: 14px; }
+    .grind-num .n { font-size: 18px; }
+    .grind-num .n.mid { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">해월로스터리 · #6 에티오피아 시다마</div>
+  <h1>아르베고나 부르사 물루게타 문타샤 74158 워시드
+    <span class="sub">Recipe 1 — Clarity / Separation</span>
+  </h1>
+  <span class="recipe-tag">Kalita Wave 155</span>
+
+  <section>
+    <h2>원두 정보</h2>
+    <dl class="bean-grid">
+      <dt>원산지</dt><dd>Ethiopia · Arbegona, Sidama</dd>
+      <dt>가공소</dt><dd>Bursa Main Station</dd>
+      <dt>생산자</dt><dd>Mulugeta Muntasha, Degefu Mulugeta</dd>
+      <dt>품종</dt><dd>74158</dd>
+      <dt>프로세스</dt><dd>Washed</dd>
+      <dt>고도</dt><dd>2,350m</dd>
+      <dt>로스팅</dt><dd>Light #102</dd>
+      <dt>컵노트</dt><dd>복숭아, 자스민, 핵과류, 오렌지</dd>
+    </dl>
+    <div class="bars">
+      <div class="bar-item">산미 <span class="dots">●●●●●</span></div>
+      <div class="bar-item">바디 <span class="dots">●●●<span class="off">●●</span></span></div>
+      <div class="bar-item">발효도 <span class="dots">●<span class="off">●●●●</span></span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>레시피 특성</h2>
+    <div class="tags">
+      <span class="tag a">시트러스 산미 강조</span>
+      <span class="tag b">클린 컵</span>
+      <span class="tag c">플로럴 분리감</span>
+    </div>
+    <div class="philosophy">
+      평평한 베드로 고른 퍼콜레이션 + 후반 감속 푸어 = 채널링 없이 자스민 향과 오렌지 산미를 각각 또렷하게
+    </div>
+  </section>
+
+  <section>
+    <h2>디개싱 · 신선도</h2>
+    <div class="degas-box">
+      <div class="degas-row"><span class="k">로스트 일자</span><span class="v">2026-09-08</span></div>
+      <div class="degas-row"><span class="k">오늘 기준 경과</span><span class="v">10일</span></div>
+      <div class="degas-row"><span class="k">최적 구간 (Light)</span><span class="v">10~21일</span></div>
+      <div class="degas-row"><span class="k">권장 소비 기한</span><span class="v">~2026-11-03 (46일 남음)</span></div>
+      <span class="degas-status">최적 구간 진입 초입 · 블룸 10초 연장 권장</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>기본 설정</h2>
+    <table class="settings">
+      <tr><td>원두</td><td>20g</td></tr>
+      <tr><td>총 물</td><td>320g</td></tr>
+      <tr><td>비율 (ratio)</td><td>1 : 16</td></tr>
+      <tr><td>물 온도</td><td>92℃</td></tr>
+      <tr><td>Comandante C40</td><td>24 click</td></tr>
+      <tr><td>목표 시간</td><td>2:45 ~ 3:00</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Brew Timeline</h2>
+    <div class="timeline">
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <div class="t-time">00:00</div>
+        <div class="t-title"><span class="t-badge pour">Pour</span>센터푸어 40g</div>
+        <div class="t-note">40초 블룸 · 디개싱 초입이라 평소보다 길게, 잔여 CO2 배출</div>
+        <div class="t-progress"><div class="t-progress-fill" style="width:12.5%"></div></div>
+        <div class="t-cumulative">누적 40g / 320g</div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <div class="t-time">00:40</div>
+        <div class="t-title"><span class="t-badge pour">Pour</span>서클푸어 110g</div>
+        <div class="t-note">베드 70~80%까지, 중간 유속</div>
+        <div class="t-progress"><div class="t-progress-fill" style="width:47%"></div></div>
+        <div class="t-cumulative">누적 150g / 320g</div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <div class="t-time">01:20</div>
+        <div class="t-title"><span class="t-badge pour">Pour</span>서클푸어 90g</div>
+        <div class="t-note">동일 범위 유지</div>
+        <div class="t-progress"><div class="t-progress-fill" style="width:75%"></div></div>
+        <div class="t-cumulative">누적 240g / 320g</div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <div class="t-time">02:00</div>
+        <div class="t-title"><span class="t-badge pour">Pour</span>서클푸어 80g</div>
+        <div class="t-note">유속 살짝 늦춤 — 난류 최소화, 미분 이동 억제</div>
+        <div class="t-progress"><div class="t-progress-fill" style="width:100%"></div></div>
+        <div class="t-cumulative">누적 320g 완료 ✓</div>
+      </div>
+
+      <div class="t-step">
+        <div class="t-dot"></div>
+        <div class="t-time">02:45~03:00</div>
+        <div class="t-title">드로다운(drawdown) 종료</div>
+      </div>
+
+    </div>
+
+    <div class="caution-box">
+      <b>공통 주의</b>
+      <ul>
+        <li>C40 클릭은 개체차가 있으므로 시작점으로만 사용, 맛과 드로다운 기준 ±1~2클릭 조정</li>
+        <li><b>센터푸어</b>: 한 점 고정이 아니라 중앙 반경 1~2cm 안에서 작은 원</li>
+        <li><b>서클푸어</b>: 중앙→바깥, 베드 70~80%까지만, 필터 벽엔 직접 붓지 않음</li>
+        <li>푸어 사이 베드를 완전히 마르게 두지 않음</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>분쇄도 참고 — Comandante C40</h2>
+    <div class="grind-box">
+      <div class="grind-name">클릭 기준 (개체차 있음, 참고용)</div>
+      <div class="grind-scale">
+        <div class="grind-num"><div class="n lo">22</div><div class="lab">신맛·밍밍<br>→ 더 곱게</div></div>
+        <div class="grind-num"><div class="n mid">24</div><div class="lab">기준값</div></div>
+        <div class="grind-num"><div class="n hi">26</div><div class="lab">쓴맛·떫음<br>→ 더 굵게</div></div>
+      </div>
+      <div class="grind-track"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>추출 의도</h2>
+    <ul class="intent">
+      <li><b>산미 5/5 · 발효도 1/5의 화사한 워시드</b> — 목표는 오렌지 산미를 날카로운 신맛이 아니라 쥬시한 시트러스로 읽히게 하는 것</li>
+      <li><b>Kalita Wave 평평한 베드</b> — 퍼콜레이션(percolation)을 고르게 만들어 채널링(channeling)으로 인한 공허한 신맛(hollow) 방지</li>
+      <li><b>92℃ 다소 높은 온도</b> — 산미 아래 단맛(sweetness)을 끌어올려 산미 각도를 부드럽게</li>
+      <li><b>후반 유속 감속</b> — 미분 이동 억제, 자스민 향과 오렌지 산미가 뭉개지지 않고 분리되어 느껴지도록</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>찾아볼 향미</h2>
+    <div class="sensory-grid">
+      <div class="sensory-item"><span class="temp">Hot</span><span class="desc">자스민 플로럴(floral) 먼저, 오렌지 제스트, 복숭아 껍질 향</span></div>
+      <div class="sensory-item"><span class="temp">60–70℃</span><span class="desc">복숭아 단맛 확장, 오렌지가 더 쥬시해짐, 산미·단맛 통합 시작</span></div>
+      <div class="sensory-item"><span class="temp">50–60℃</span><span class="desc">핵과류 단맛 중심 이동, 자스민은 배경으로, 바디감 풍성해짐</span></div>
+      <div class="sensory-item"><span class="temp">Cool</span><span class="desc">은은한 자스민 잔향 + 가벼운 복숭아 단맛, 깔끔한 시트러스 피니시</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>조정 가이드</h2>
+    <div class="adj-row"><span class="adj-symptom">신맛·공허함</span><span class="adj-fix">온도 +1~2℃ 또는 분쇄 1~2클릭 곱게</span></div>
+    <div class="adj-row"><span class="adj-symptom">쓴맛(bitter)</span><span class="adj-fix">온도 낮추기, 분쇄 굵게</span></div>
+    <div class="adj-row"><span class="adj-symptom">떫음(astringent)</span><span class="adj-fix">후반 유속 늦추고 교반(agitation) 줄이기</span></div>
+    <div class="adj-row"><span class="adj-symptom">바디 약함</span><span class="adj-fix">dose 소폭 증가 또는 비율 1:15</span></div>
+    <div class="adj-row"><span class="adj-symptom">향 둔함</span><span class="adj-fix">블룸 10초 연장 또는 분쇄 소폭 곱게</span></div>
+    <div class="adj-row"><span class="adj-symptom">산미 과도하게 날카로움</span><span class="adj-fix">온도 올리기, 블룸 연장, 마지막 푸어 유속 늦춤</span></div>
+  </section>
+
+  <section>
+    <h2>성공 기준</h2>
+    <div class="success-box">
+      뜨거울 때 자스민 플로럴이 살아있고, 식으면서 산미가 쥬시한 오렌지로 부드러워지며, 복숭아 단맛이 배경에서 은은하게 받쳐주는 것이 목표입니다.
+    </div>
+  </section>
+
+  <footer>Coffee Brewing Recipe Builder · Recipe 1 of 3</footer>
+</div>
+</body>
+</html>

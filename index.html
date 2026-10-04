@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>나의 브루잉 레시피 북</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf6f1; --panel: #f1e9df; --panel-2: #e9dfd2; --line: #dccdbb;
+    --text: #2a1d14; --dim: #6b5847; --faint: #9a8673;
+    --crema: #a8692a; --crema-soft: rgba(168,105,42,.12);
+    --tea: #3f8a73; --sweet: #b5653a; --aroma: #7d6aa0; --clear: #3a7ca5;
+    --serif: "Gowun Batang", "Noto Serif KR", "Apple SD Gothic Neo", serif;
+    --sans: "Noto Sans KR", -apple-system, "Apple SD Gothic Neo", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a130e; --panel: #241a13; --panel-2: #2c2118; --line: #3a2c20;
+      --text: #efe4d4; --dim: #b9a48c; --faint: #85725e;
+      --crema: #dba45e; --crema-soft: rgba(219,164,94,.14);
+      --tea: #6cc0a4; --sweet: #e3925f; --aroma: #ab97cf; --clear: #78b5dc;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1a130e; --panel: #241a13; --panel-2: #2c2118; --line: #3a2c20;
+    --text: #efe4d4; --dim: #b9a48c; --faint: #85725e;
+    --crema: #dba45e; --crema-soft: rgba(219,164,94,.14);
+    --tea: #6cc0a4; --sweet: #e3925f; --aroma: #ab97cf; --clear: #78b5dc;
+  }
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--sans); line-height: 1.55; -webkit-text-size-adjust: 100%; }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--crema); outline-offset: 2px; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 18px 64px; }
+
+  /* masthead */
+  header.mast { padding: 28px 0 10px; }
+  .mast h1 { font-family: var(--serif); font-weight: 700; font-size: 30px; line-height: 1.2; margin: 0; letter-spacing: -0.01em; }
+  .mast p { margin: 6px 0 0; color: var(--dim); font-size: 14px; }
+
+  /* search */
+  .searchbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 12px 0 8px; }
+  .search { display: flex; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; }
+  .search svg { flex: none; color: var(--faint); }
+  .search input { flex: 1; border: 0; background: transparent; padding: 13px 0; font-size: 16px; outline: none; min-width: 0; }
+  .search .clear { border: 0; background: none; color: var(--faint); font-size: 14px; padding: 6px; }
+
+  .filters { margin-top: 10px; display: grid; gap: 8px; }
+  .frow { display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .frow::-webkit-scrollbar { display: none; }
+  .frow.multi { display: grid; grid-template-columns: 52px 1fr; align-items: start; gap: 8px; overflow: visible; }
+  .frow.multi .lab { padding-top: 7px; }
+  .fgroup { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .frow.multi .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .frow .lab { flex: none; font-size: 12.5px; color: var(--faint); width: 52px; }
+  .chip { flex: none; border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 6px 12px; font-size: 13.5px; color: var(--dim); white-space: nowrap; }
+  .chip:disabled { opacity: .38; cursor: default; border-style: dashed; }
+  .chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--bg); }
+  .range { display: flex; align-items: center; gap: 6px; flex: none; }
+  .range input { width: 64px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: transparent; font-size: 14px; }
+  .range span { color: var(--faint); font-size: 13px; }
+  .count { font-size: 13px; color: var(--faint); margin: 14px 0 4px; display: flex; justify-content: space-between; align-items: center; }
+  .count button { border: 0; background: none; color: var(--crema); font-size: 13px; padding: 4px; }
+
+  /* bean chapter */
+  .bean { margin-top: 26px; }
+  .bean-head { border-left: 3px solid var(--crema); padding: 2px 0 2px 14px; }
+  .bean-head h2 { font-family: var(--serif); font-size: 21px; font-weight: 700; margin: 0; line-height: 1.3; }
+  .bean-head .meta { font-size: 13px; color: var(--dim); margin-top: 3px; }
+  .bean-head .notes { font-size: 13px; color: var(--faint); margin-top: 2px; }
+  .recipes { margin-top: 12px; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .rrow { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; padding: 14px 14px; background: var(--panel); border: 0; text-align: left; width: 100%; }
+  .rrow:active { background: var(--panel-2); }
+  .rank { font-family: var(--serif); font-size: 26px; font-weight: 700; line-height: 1; color: var(--crema); text-align: center; padding-top: 2px; }
+  .rank small { display: block; font-family: var(--sans); font-size: 10.5px; font-weight: 500; color: var(--faint); margin-top: 4px; }
+  .rtitle { font-weight: 700; font-size: 15.5px; }
+  .rsub { font-size: 13px; color: var(--dim); margin-top: 2px; }
+  .rparams { font-size: 12.5px; color: var(--faint); margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .tag { display: inline-block; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; margin-right: 6px; vertical-align: 1px; }
+  .t-tea { color: var(--tea); background: color-mix(in srgb, var(--tea) 14%, transparent); }
+  .t-sweetness { color: var(--sweet); background: color-mix(in srgb, var(--sweet) 14%, transparent); }
+  .t-aroma { color: var(--aroma); background: color-mix(in srgb, var(--aroma) 16%, transparent); }
+  .t-clarity { color: var(--clear); background: color-mix(in srgb, var(--clear) 14%, transparent); }
+
+  .empty { margin-top: 40px; padding: 28px 20px; border: 1px dashed var(--line); border-radius: 12px; color: var(--dim); font-size: 14.5px; }
+  .empty b { color: var(--text); }
+
+  /* detail */
+  .detail { position: fixed; inset: 0; background: var(--bg); overflow-y: auto; z-index: 20; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .detail[hidden] { display: none; }
+  .dbar { position: sticky; top: 0; z-index: 2; background: var(--bg); display: flex; align-items: center; justify-content: space-between; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+  .dbar button { border: 0; background: none; font-size: 15px; padding: 8px 4px; color: var(--crema); }
+  .d-wrap { max-width: 720px; margin: 0 auto; padding: 18px 18px 80px; }
+  .d-bean { font-size: 13.5px; color: var(--dim); }
+  .d-title { font-family: var(--serif); font-size: 26px; font-weight: 700; margin: 4px 0 8px; line-height: 1.25; }
+  .d-gear { font-size: 13.5px; color: var(--dim); }
+  .why { margin-top: 14px; background: var(--crema-soft); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+  .why b { color: var(--crema); }
+  .phil { margin-top: 10px; font-family: var(--serif); font-size: 16px; line-height: 1.6; color: var(--text); }
+  .dsec { margin-top: 30px; }
+  .dsec h3 { font-size: 13.5px; font-weight: 700; color: var(--faint); margin: 0 0 10px; }
+
+  .params { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .param { background: var(--panel); padding: 12px 10px; }
+  .param .k { font-size: 11.5px; color: var(--faint); }
+  .param .v { font-size: 17px; font-weight: 700; margin-top: 2px; line-height: 1.3; word-break: keep-all; }
+  .param .v small { display: block; font-size: 12px; font-weight: 500; color: var(--dim); }
+  .param.wide { grid-column: span 3; }
+
+  /* timer + timeline */
+  .timer { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 14px; }
+  .clock { font-family: var(--serif); font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+  .tbtns { display: flex; gap: 8px; }
+  .tbtns button { border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px 14px; font-size: 14.5px; font-weight: 700; }
+  .tbtns button.go { background: var(--crema); border-color: var(--crema); color: var(--bg); }
+  .steps { list-style: none; margin: 0; padding: 0; }
+  .step { display: grid; grid-template-columns: 74px 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .step:last-child { border-bottom: 0; }
+  .step > div { min-width: 0; }
+  .step .at { font-family: var(--serif); font-size: 19px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--dim); line-height: 1.2; overflow-wrap: anywhere; }
+  .step .at small { display: block; font-size: 14px; font-weight: 700; margin-top: 2px; }
+  .step .st { font-weight: 700; font-size: 15px; }
+  .step .sn { font-size: 13.5px; color: var(--dim); margin-top: 2px; }
+  .step .cum { font-size: 13px; color: var(--crema); font-weight: 700; margin-top: 4px; }
+  .step.now { background: var(--crema-soft); margin: 0 -10px; padding-left: 10px; padding-right: 10px; border-radius: 10px; }
+  .step.now .at { color: var(--crema); }
+  .step.done { opacity: .5; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 5px; margin-right: 6px; vertical-align: 1px; border: 1px solid currentColor; }
+  .b-open { color: var(--tea); } .b-closed { color: var(--aroma); } .b-pour, .b-bypass { color: var(--sweet); } .b-swirl { color: var(--crema); }
+
+  .grind { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .grind div { background: var(--panel); padding: 12px; }
+  .grind .k { font-size: 12px; color: var(--faint); }
+  .grind .v { font-family: var(--serif); font-size: 26px; font-weight: 700; }
+  .grind .r { font-size: 12.5px; color: var(--dim); }
+
+  .plain { margin: 0; padding-left: 18px; font-size: 14.5px; color: var(--dim); }
+  .plain li { margin-bottom: 8px; }
+  .plain b { color: var(--text); }
+  dl.pairs { margin: 0; display: grid; grid-template-columns: minmax(84px, 34%) 1fr; gap: 8px 12px; font-size: 14px; }
+  dl.pairs dt { color: var(--crema); font-weight: 700; }
+  dl.pairs dd { margin: 0; color: var(--dim); }
+  dl.adj dt { color: var(--sweet); }
+  .success { border: 1px solid var(--crema); border-radius: 12px; padding: 14px; font-size: 14.5px; }
+  .beaninfo { font-size: 13.5px; color: var(--dim); }
+  .beaninfo span { display: inline-block; margin-right: 12px; }
+
+  /* notes */
+  .note-form { display: grid; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .stars { display: flex; gap: 4px; }
+  .stars button { border: 0; background: none; font-size: 26px; line-height: 1; padding: 2px; color: var(--line); }
+  .stars button.on { color: var(--crema); }
+  .note-form textarea { width: 100%; min-height: 76px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 10px; font-size: 15px; resize: vertical; }
+  .note-form .save { justify-self: start; border: 0; background: var(--crema); color: var(--bg); border-radius: 10px; padding: 10px 16px; font-weight: 700; }
+  .note { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .note .nh { color: var(--faint); font-size: 12.5px; }
+  .note .nh .s { color: var(--crema); letter-spacing: 1px; }
+  .msg { font-size: 13px; color: var(--faint); }
+  .export { margin-top: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--crema-soft); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; }
+  .export[hidden] { display: none; }
+  .export button { border: 0; background: var(--crema); color: var(--bg); border-radius: 8px; padding: 8px 12px; font-weight: 700; flex: none; }
+  .note .pending { color: var(--sweet); font-weight: 700; margin-left: 6px; }
+  .del { margin-top: 36px; border: 0; background: none; color: var(--faint); font-size: 13px; text-decoration: underline; padding: 4px 0; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .detail:not([hidden]) .d-wrap { animation: rise .22s ease-out; }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <h1>나의 브루잉 레시피 북</h1>
+    <p id="sub">원두, 품종, 드리퍼, 로스팅, 취향으로 찾아보세요.</p>
+    <div class="export" id="exportbar" hidden>
+      <span id="exportmsg"></span>
+      <button id="exportbtn">노트 복사</button>
+    </div>
+  </header>
+
+  <div class="searchbar">
+    <label class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="원두명, 품종, 컵노트, 드리퍼…" autocomplete="off" aria-label="레시피 검색">
+      <button class="clear" id="qclear" hidden>지우기</button>
+    </label>
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <div class="count"><span id="count"></span><button id="reset" hidden>필터 초기화</button></div>
+  <main id="list"></main>
+</div>
+
+<section class="detail" id="detail" hidden aria-modal="true" role="dialog">
+  <div class="dbar"><button id="back">← 목록</button><span class="msg" id="dmsg"></span></div>
+  <div class="d-wrap" id="dbody"></div>
+</section>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  const LEVELS = [["ultralight","울트라 라이트"],["light","라이트"],["medium","미디엄"],["dark","다크"]];
+  const TASTES = [["clarity","선명함"],["sweetness","단맛"],["tea-like","티라이크"],["aroma","향 볼륨"]];
+  const TASTE_CLASS = {"clarity":"t-clarity","sweetness":"t-sweetness","tea-like":"t-tea","aroma":"t-aroma"};
+  const TASTE_NAME = Object.fromEntries(TASTES);
+  const LEVEL_NAME = Object.fromEntries(LEVELS);
+  const POS_NAME = {bright:"밝은 쪽", mid:"중간", dark:"어두운 쪽"};
+  const OWNED_DRIPPERS = ["Hario Pegasus 01","Origami Air S","Hario NEO 02","UFO Dripper V3","Hario Switch 02",
+    "Kalita Wave 155","Beandy Silk Dripper","Kalita 101D","AeroPress","Hario Drip Assist"];
+
+  const state = { recipes: [], notes: [], q: "", f: { bean:null, roastery:null, country:null, farm:null, variety:null, process:null, dripper:null, level:null, taste:null }, cmin:"", cmax:"", open:null, loaded:true };
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const norm = (s) => String(s ?? "").toLowerCase().replace(/\s+/g, "");
+
+  /* ---------- filters ---------- */
+  function uniq(arr) { return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko")); }
+  function renderFilters() {
+    const R = state.recipes;
+    const beans = uniq(R.map(r => r.beanName));
+    const vars = uniq(R.map(r => r.variety));
+    const roasters = uniq(R.map(r => r.roastery));
+    const countries = uniq(R.map(r => r.country));
+    const farms = uniq(R.map(r => r.farm));
+    const procs = uniq(R.map(r => r.process));
+    const drips = uniq(R.flatMap(r => r.drippers || []));
+    const row = (key, label, opts, unused = [], multi = false) => (opts.length || unused.length) ? `<div class="frow${multi ? " multi" : ""}" role="group" aria-label="${label}"><span class="lab">${label}</span>${multi ? '<div class="chips">' : ""}${
+      opts.map(([v,t]) => `<button class="chip" data-k="${key}" data-v="${esc(v)}" aria-pressed="${state.f[key]===v}">${esc(t)}</button>`).join("")}${
+      unused.map(v => `<button class="chip" disabled title="아직 이 드리퍼로 저장된 레시피가 없어요">${esc(v)}</button>`).join("")}${multi ? "</div>" : ""}</div>` : "";
+    const unusedDrips = OWNED_DRIPPERS.filter(d => !drips.includes(d));
+    $("#filters").innerHTML =
+      row("taste","취향",TASTES) +
+      row("level","로스팅",LEVELS) +
+      `<div class="frow"><span class="lab">색도</span><span class="range"><input id="cmin" inputmode="numeric" placeholder="최소" value="${esc(state.cmin)}" aria-label="색도 최소"><span>~</span><input id="cmax" inputmode="numeric" placeholder="최대" value="${esc(state.cmax)}" aria-label="색도 최대"></span><span class="msg">#숫자 (높을수록 밝음)</span></div>` +
+      row("dripper","드리퍼",drips.map(d=>[d,d]), unusedDrips, true) +
+      `<div class="fgroup">` +
+      row("bean","원두",beans.map(d=>[d,d]), [], true) +
+      row("roastery","로스터",roasters.map(d=>[d,d]), [], true) +
+      row("country","나라",countries.map(d=>[d,d]), [], true) +
+      row("farm","농장",farms.map(d=>[d,d]), [], true) +
+      row("variety","품종",vars.map(d=>[d,d]), [], true) +
+      row("process","프로세스",procs.map(d=>[d,d]), [], true) +
+      `</div>`;
+    $("#filters").querySelectorAll(".chip:not(:disabled)").forEach(b => b.addEventListener("click", () => {
+      const k = b.dataset.k, v = b.dataset.v;
+      state.f[k] = state.f[k] === v ? null : v;
+      renderFilters(); renderList();
+    }));
+    ["cmin","cmax"].forEach(id => $("#"+id).addEventListener("input", e => { state[id] = e.target.value.replace(/[^\d.]/g,""); renderList(); }));
+  }
+
+  function matches(r) {
+    const f = state.f;
+    if (f.bean && r.beanName !== f.bean) return false;
+    if (f.variety && r.variety !== f.variety) return false;
+    if (f.roastery && r.roastery !== f.roastery) return false;
+    if (f.country && r.country !== f.country) return false;
+    if (f.farm && r.farm !== f.farm) return false;
+    if (f.process && r.process !== f.process) return false;
+    if (f.dripper && !(r.drippers||[]).includes(f.dripper)) return false;
+    if (f.level && r.roastLevel !== f.level) return false;
+    if (f.taste && r.intent !== f.taste) return false;
+    const lo = parseFloat(state.cmin), hi = parseFloat(state.cmax);
+    if (!isNaN(lo) || !isNaN(hi)) {
+      if (typeof r.colorValue !== "number") return false;
+      if (!isNaN(lo) && r.colorValue < lo) return false;
+      if (!isNaN(hi) && r.colorValue > hi) return false;
+    }
+    const q = norm(state.q);
+    if (q) {
+      const hay = norm([r.beanName, r.beanNameEn, r.roastery, r.country, r.region, r.farm, r.producer, r.variety, r.process,
+        r.roastLabel, LEVEL_NAME[r.roastLevel], r.title, TASTE_NAME[r.intent], r.filter, ...(r.drippers||[]), ...(r.cupNotes||[]), ...(r.tags||[])].join(" "));
+      if (!q.split(/[,]/).every(t => hay.includes(t))) return false;
+    }
+    return true;
+  }
+
+  /* ---------- list ---------- */
+  function renderList() {
+    const list = $("#list");
+    const active = state.q || Object.values(state.f).some(Boolean) || state.cmin || state.cmax;
+    $("#reset").hidden = !active;
+
+    if (!state.recipes.length) {
+      list.innerHTML = `<div class="empty"><b>아직 저장된 레시피가 없어요.</b><br>Claude Code에서 레시피를 만들면 recipes/ 폴더에 저장되고, push 후 여기에 쌓입니다.</div>`;
+      $("#count").textContent = ""; return;
+    }
+    const hits = state.recipes.filter(matches);
+    $("#count").textContent = `레시피 ${hits.length}개 · 원두 ${new Set(hits.map(r=>r.beanId)).size}종`;
+    if (!hits.length) { list.innerHTML = `<div class="empty"><b>조건에 맞는 레시피가 없어요.</b><br>필터를 하나씩 풀거나 검색어를 줄여 보세요.</div>`; return; }
+    const groups = new Map();
+    hits.forEach(r => { if (!groups.has(r.beanId)) groups.set(r.beanId, []); groups.get(r.beanId).push(r); });
+    const ordered = [...groups.values()].sort((a,b) => String(b[0].createdAt||"").localeCompare(String(a[0].createdAt||"")));
+    list.innerHTML = ordered.map(rs => {
+      rs.sort((a,b) => (a.rank||9)-(b.rank||9));
+      const b = rs[0];
+      const pos = b.roastPosition ? ` (${POS_NAME[b.roastPosition]||b.roastPosition})` : "";
+      return `<section class="bean">
+        <div class="bean-head">
+          <h2>${esc(b.beanName)}</h2>
+          <div class="meta">${esc(b.roastery||"")} · ${esc(b.variety||"")} · ${esc(b.process||"")} · ${esc(b.roastLabel||LEVEL_NAME[b.roastLevel]||"")}${esc(pos)}</div>
+          ${b.cupNotes?.length ? `<div class="notes">${esc(b.cupNotes.join(", "))}${b.roastDate ? ` · 로스팅 ${esc(b.roastDate)}` : ""}</div>` : ""}
+        </div>
+        <div class="recipes">${rs.map(r => `
+          <button class="rrow" data-id="${esc(r.id)}">
+            <div class="rank">${r.rank ?? "–"}<small>추천</small></div>
+            <div>
+              <div class="rtitle"><span class="tag ${TASTE_CLASS[r.intent]||""}">${esc(TASTE_NAME[r.intent]||r.intent||"")}</span>${esc(r.title)}</div>
+              <div class="rsub">${esc((r.drippers||[]).join(" + "))}${r.filter ? ` · ${esc(r.filter)}` : ""}</div>
+              <div class="rparams"><span>${esc(r.settings?.dose)} / ${esc(r.settings?.ratio)}</span><span>${esc(r.settings?.temp)}</span><span>C40 ${esc(r.settings?.c40)} · RC ${esc(r.settings?.redclix)}</span>${noteSummary(r.id)}</div>
+            </div>
+          </button>`).join("")}
+        </div></section>`;
+    }).join("");
+    list.querySelectorAll(".rrow").forEach(el => el.addEventListener("click", () => openDetail(el.dataset.id)));
+  }
+  function noteSummary(id) {
+    const ns = state.notes.filter(n => n.recipeId === id);
+    if (!ns.length) return "";
+    const avg = ns.reduce((s,n)=>s+(n.rating||0),0)/ns.length;
+    return `<span>★ ${avg.toFixed(1)} (${ns.length}회)</span>`;
+  }
+
+  /* ---------- detail ---------- */
+  let timer = null, t0 = 0, elapsed = 0;
+  function fmtAt(t) {
+    const str = String(t ?? "");
+    const i = str.indexOf("~");
+    return i > 0 ? `${esc(str.slice(0, i))}<small>~${esc(str.slice(i + 1))}</small>` : esc(str);
+  }
+  function parseT(t) { const m = /^(\d{1,2}):(\d{2})/.exec(String(t||"")); return m ? (+m[1])*60 + (+m[2]) : null; }
+  function fmt(s) { return `${String(Math.floor(s/60)).padStart(2,"0")}:${String(Math.floor(s%60)).padStart(2,"0")}`; }
+
+  function openDetail(id) {
+    const r = state.recipes.find(x => x.id === id); if (!r) return;
+    state.open = id; stopTimer(true);
+    const s = r.settings || {};
+    const pos = r.roastPosition ? ` → ${LEVEL_NAME[r.roastLevel]||""} (${POS_NAME[r.roastPosition]||""})` : "";
+    const g = parseInt(s.c40), rc = parseInt(s.redclix);
+    $("#dbody").innerHTML = `
+      <div class="d-bean">${esc(r.beanName)} · ${esc(r.roastery||"")}</div>
+      <div class="d-title">${esc(r.title)}</div>
+      <div class="d-gear"><span class="tag ${TASTE_CLASS[r.intent]||""}">${esc(TASTE_NAME[r.intent]||"")}</span>${esc((r.drippers||[]).join(" + "))}${r.filter ? ` · ${esc(r.filter)}` : ""}</div>
+      ${r.rankReason ? `<div class="why"><b>추천 ${r.rank}순위</b> — ${esc(r.rankReason)}</div>` : ""}
+      ${r.philosophy ? `<p class="phil">${esc(r.philosophy)}</p>` : ""}
+
+      <div class="dsec"><h3>기본 설정</h3>
+        <div class="params">
+          <div class="param"><div class="k">원두</div><div class="v">${esc(s.dose)}</div></div>
+          <div class="param"><div class="k">비율</div><div class="v">${esc(s.ratio)}</div></div>
+          <div class="param"><div class="k">목표 시간</div><div class="v">${esc(s.time)}</div></div>
+          <div class="param wide"><div class="k">물</div><div class="v">${esc(s.water)}</div></div>
+          <div class="param wide"><div class="k">온도</div><div class="v">${esc(s.temp)}</div></div>
+        </div>
+      </div>
+
+      <div class="dsec"><h3>분쇄도</h3>
+        <div class="grind">
+          <div><div class="k">C40 표준</div><div class="v">${esc(s.c40)}</div>${!isNaN(g) ? `<div class="r">조정 ${g-2} ~ ${g+2}</div>` : ""}</div>
+          <div><div class="k">Red Clix</div><div class="v">${esc(s.redclix)}</div>${!isNaN(rc) ? `<div class="r">조정 ${rc-4} ~ ${rc+4}</div>` : ""}</div>
+        </div>
+        ${r.grindNote ? `<p class="msg" style="margin:8px 0 0">${esc(r.grindNote)}</p>` : ""}
+      </div>
+
+      <div class="dsec"><h3>추출 순서</h3>
+        <div class="timer"><div class="clock" id="clock">00:00</div>
+          <div class="tbtns"><button class="go" id="tgo">시작</button><button id="treset">리셋</button></div></div>
+        <ol class="steps" id="steps">${(r.steps||[]).map((st,i) => `
+          <li class="step" data-i="${i}" data-at="${parseT(st.t) ?? ""}">
+            <div class="at">${fmtAt(st.t)}</div>
+            <div>
+              <div class="st">${(st.badges||[]).map(b => `<span class="badge b-${esc(String(b).toLowerCase())}">${esc(b)}</span>`).join("")}${esc(st.title)}</div>
+              ${st.note ? `<div class="sn">${esc(st.note)}</div>` : ""}
+              ${st.cum != null ? `<div class="cum">누적 ${esc(st.cum)}g${r.total ? ` / ${esc(r.total)}g` : ""}</div>` : ""}
+            </div>
+          </li>`).join("")}
+        </ol>
+        ${r.cautions?.length ? `<ul class="plain" style="margin-top:12px">${r.cautions.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+      </div>
+
+      ${r.intentNotes?.length ? `<div class="dsec"><h3>추출 의도</h3><ul class="plain">${r.intentNotes.map(([a,b])=>`<li><b>${esc(a)}</b> — ${esc(b)}</li>`).join("")}</ul></div>` : ""}
+      ${r.sensory?.length ? `<div class="dsec"><h3>찾아볼 향미</h3><dl class="pairs">${r.sensory.map(([a,b])=>`<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl></div>` : ""}
+      ${r.adjust?.length ? `<div class="dsec"><h3>조정 가이드</h3><dl class="pairs adj">${r.adjust.map(([a,b])=>`<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl></div>` : ""}
+      ${r.success ? `<div class="dsec"><h3>성공 기준</h3><div class="success">${esc(r.success)}</div></div>` : ""}
+
+      <div class="dsec"><h3>원두 정보</h3><div class="beaninfo">
+        ${[["원산지",[r.country,r.region].filter(Boolean).join(", ")],["농장",r.farm],["생산자",r.producer],["품종",r.variety],["가공",r.process],["고도",r.altitude],
+          ["로스팅",(r.roastLabel||"")+pos],["로스트 일자",r.roastDate],["냉동",r.frozenDate],["컵노트",(r.cupNotes||[]).join(", ")]]
+          .filter(([,v])=>v).map(([k,v])=>`<span>${esc(k)} <b>${esc(v)}</b></span>`).join("")}
+      </div></div>
+
+      <div class="dsec"><h3>브루 노트</h3>
+        <div class="note-form" id="nform">
+          <div class="stars" id="stars" role="radiogroup" aria-label="평점">${[1,2,3,4,5].map(n=>`<button data-n="${n}" aria-label="${n}점">★</button>`).join("")}</div>
+          <textarea id="nmemo" placeholder="맛, 바꾼 점, 다음에 시도할 것 (예: RC 47로 한 클릭 곱게 → 단맛 좋아짐)"></textarea>
+          <button class="save" id="nsave">노트 저장</button>
+          <span class="msg" id="nmsg"></span>
+        </div>
+        <div id="nlist"></div>
+      </div>`;
+    $("#detail").hidden = false; document.body.style.overflow = "hidden";
+    $("#detail").scrollTop = 0;
+    bindDetail(r);
+    renderNotes();
+  }
+
+  let rating = 0;
+  function bindDetail(r) {
+    rating = 0;
+    $("#tgo").addEventListener("click", () => timer ? stopTimer(false) : startTimer());
+    $("#treset").addEventListener("click", () => stopTimer(true));
+    $("#stars").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+      rating = +b.dataset.n;
+      $("#stars").querySelectorAll("button").forEach(x => x.classList.toggle("on", +x.dataset.n <= rating));
+    }));
+    $("#nsave").addEventListener("click", saveNote);
+  }
+  function startTimer() {
+    t0 = performance.now() - elapsed * 1000;
+    timer = setInterval(tick, 250); tick();
+    $("#tgo").textContent = "일시정지";
+  }
+  function stopTimer(reset) {
+    if (timer) { clearInterval(timer); timer = null; }
+    if (reset) elapsed = 0;
+    const go = $("#tgo"); if (go) go.textContent = reset ? "시작" : "계속";
+    if (reset) paint();
+  }
+  function tick() { elapsed = (performance.now() - t0) / 1000; paint(); }
+  function paint() {
+    const c = $("#clock"); if (!c) return;
+    c.textContent = fmt(elapsed);
+    const steps = [...document.querySelectorAll("#steps .step")];
+    let cur = -1;
+    steps.forEach((el, i) => { const a = el.dataset.at; if (a !== "" && elapsed >= +a) cur = i; });
+    steps.forEach((el, i) => { el.classList.toggle("now", elapsed > 0 && i === cur); el.classList.toggle("done", elapsed > 0 && i < cur); });
+  }
+  function closeDetail() { stopTimer(true); state.open = null; $("#detail").hidden = true; document.body.style.overflow = ""; }
+  $("#back").addEventListener("click", closeDetail);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && state.open) closeDetail(); });
+
+  function renderNotes() {
+    const el = $("#nlist"); if (!el || !state.open) return;
+    const ns = allNotes().filter(n => n.recipeId === state.open).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+    el.innerHTML = ns.length ? ns.map(n => `<div class="note"><div class="nh"><span class="s">${"★".repeat(n.rating||0)}${"☆".repeat(5-(n.rating||0))}</span> ${esc(n.date)}${n._pending ? `<span class="pending">이 기기에만 저장됨</span>` : ""}</div><div>${esc(n.memo)}</div></div>`).join("")
+      : `<p class="msg" style="margin-top:12px">아직 기록이 없어요. 내려 마신 뒤 평점과 메모를 남겨 두면, 다음 레시피를 만들 때 Claude가 참고할 수 있어요.</p>`;
+  }
+  async function saveNote() {
+    const memo = $("#nmemo").value.trim();
+    if (!rating && !memo) { $("#nmsg").textContent = "평점이나 메모를 하나 이상 남겨 주세요."; return; }
+    const d = new Date();
+    const date = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+    const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,6)}`;
+    const p = loadPending(); p.push({ id, recipeId: state.open, rating, memo, date });
+    if (!savePending(p)) { $("#nmsg").textContent = "이 브라우저에서는 노트를 저장할 수 없어요. 메모를 Claude Code에 직접 알려 주세요."; return; }
+    $("#nmemo").value = ""; rating = 0;
+    $("#stars").querySelectorAll("button").forEach(x => x.classList.remove("on"));
+    $("#nmsg").textContent = "이 기기에 저장했어요. 위쪽 '노트 복사'로 Claude Code에 전달하면 레시피 북에 반영돼요.";
+    renderNotes(); renderList(); renderExport();
+  }
+
+  /* ---------- search input ---------- */
+  $("#q").addEventListener("input", e => { state.q = e.target.value; $("#qclear").hidden = !state.q; renderList(); });
+  $("#qclear").addEventListener("click", e => { e.preventDefault(); state.q = ""; $("#q").value = ""; $("#qclear").hidden = true; renderList(); });
+  $("#reset").addEventListener("click", () => {
+    state.q = ""; $("#q").value = ""; $("#qclear").hidden = true;
+    Object.keys(state.f).forEach(k => state.f[k] = null); state.cmin = state.cmax = "";
+    renderFilters(); renderList();
+  });
+
+  /* ---------- data (static: data.js + 이 기기의 미반영 노트) ---------- */
+  const PKEY = "coffee-recipe-book:pending-notes";
+  function loadPending() { try { return JSON.parse(localStorage.getItem(PKEY) || "[]"); } catch (_) { return []; } }
+  function savePending(arr) { try { localStorage.setItem(PKEY, JSON.stringify(arr)); return true; } catch (_) { return false; } }
+  function allNotes() { return [...state.notes, ...loadPending().map(n => ({ ...n, _pending: true }))]; }
+  function renderExport() {
+    const p = loadPending();
+    $("#exportbar").hidden = !p.length;
+    $("#exportmsg").textContent = `Claude Code에 아직 전달하지 않은 노트 ${p.length}개`;
+  }
+  $("#exportbtn").addEventListener("click", async () => {
+    const text = "브루 노트를 notes/notes.json에 추가해줘:\n" + JSON.stringify(loadPending(), null, 2);
+    try { await navigator.clipboard.writeText(text); $("#exportmsg").textContent = "복사했어요. Claude Code에 붙여 넣으세요."; }
+    catch (_) {
+      const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); $("#exportmsg").textContent = "복사했어요. Claude Code에 붙여 넣으세요."; }
+      catch (e) { $("#exportmsg").textContent = "복사하지 못했어요. 길게 눌러 직접 복사해 주세요."; }
+      t.remove();
+    }
+  });
+
+  state.recipes = Array.isArray(window.RECIPES) ? window.RECIPES : [];
+  state.notes = Array.isArray(window.NOTES) ? window.NOTES : [];
+  // 이미 notes.json에 반영된 노트는 이 기기의 대기 목록에서 지운다
+  const merged = new Set(state.notes.map(n => n.id));
+  savePending(loadPending().filter(n => !merged.has(n.id)));
+  renderFilters(); renderList(); renderExport();
+})();
+</script>
+</body>
+</html>
