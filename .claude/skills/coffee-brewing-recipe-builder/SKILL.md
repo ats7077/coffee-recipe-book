@@ -74,11 +74,16 @@ UFO + standard base / UFO + Switch base / Switch 02.
 | 필터 (정식 이름) | 맞는 드리퍼 | 흐름 특성 | 잘 맞는 방향 |
 |---|---|---|---|
 | `Hario 01 콘 필터` | Pegasus 01, Origami Air S | 기준(순정) | 드리퍼 기본 특성 그대로 |
-| `Hario 02 콘 필터` | NEO 02, Switch 02, UFO V3 | 기준(순정) | 드리퍼 기본 특성 그대로 |
-| `HIFLUX Folding V02` | 02 콘 필터를 쓰는 드리퍼 (NEO 02, Switch 02 등) | **Fast** — 순정보다 배출이 빠름 | 클래리티, 티라이크, 곱게 갈아야 하는 밝은 로스트 |
+| `Hario 02 콘 필터` | NEO 02, Switch 02 | 기준(순정) | 드리퍼 기본 특성 그대로 |
+| `HIFLUX Folding V02` | NEO 02, Switch 02 **만** | **Fast** — 순정보다 배출이 빠름 | 클래리티, 티라이크, 곱게 갈아야 하는 밝은 로스트 |
 | `Kalita Wave 155 필터` | Kalita Wave 155, 빈디 실크, Origami Air S(웨이브) | 기준(순정), 평평한 베드 | 단맛·밸런스 |
 | `Kalita 101 필터` | Kalita 101D | 기준(순정), 느린 배출 | 바디·단맛 |
 | `AeroPress 필터` | AeroPress | 가압 배출 | 추출 보강 |
+
+필터 호환 주의(사용자 확인):
+- UFO Dripper V3는 콘 기울기가 달라 V02 규격 필터(HIFLUX Folding V02 포함)를 쓰지 못한다.
+  UFO용 필터는 아직 목록에 없으므로, UFO 레시피를 만들 때는 어떤 필터를 쓰는지 먼저 묻는다.
+- Origami Air S는 사이즈가 달라 HIFLUX Folding V02를 쓰지 않는다.
 
 Fast 필터(HIFLUX Folding V02)를 쓸 때의 설계 규칙:
 - 같은 분쇄도면 드로다운이 짧아져 접촉시간·추출률이 떨어진다. 순정 필터 레시피를
