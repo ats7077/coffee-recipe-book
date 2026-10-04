@@ -231,15 +231,17 @@
   const norm = (s) => String(s ?? "").toLowerCase().replace(/\s+/g, "");
 
   /* ---------- filters ---------- */
+  // 블렌드는 "Ethiopia, Peru"처럼 여러 값을 적는다 — 쉼표·슬래시로 나눠 각각 칩이 되게 한다.
+  const parts = (v) => String(v ?? "").split(/\s*[,/]\s*/).filter(Boolean);
   function uniq(arr) { return [...new Set(arr.filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko")); }
   function renderFilters() {
     const R = state.recipes;
     const beans = uniq(R.map(r => r.beanName));
-    const vars = uniq(R.map(r => r.variety));
+    const vars = uniq(R.flatMap(r => parts(r.variety)));
     const roasters = uniq(R.map(r => r.roastery));
-    const countries = uniq(R.map(r => r.country));
-    const farms = uniq(R.map(r => r.farm));
-    const procs = uniq(R.map(r => r.process));
+    const countries = uniq(R.flatMap(r => parts(r.country)));
+    const farms = uniq(R.flatMap(r => parts(r.farm)));
+    const procs = uniq(R.flatMap(r => parts(r.process)));
     const drips = uniq(R.flatMap(r => r.drippers || []));
     const filts = uniq(R.map(r => r.filter));
     const row = (key, label, opts, unused = [], multi = false) => (opts.length || unused.length) ? `<div class="frow${multi ? " multi" : ""}" role="group" aria-label="${label}"><span class="lab">${label}</span>${multi ? '<div class="chips">' : ""}${
@@ -278,11 +280,11 @@
   function matches(r) {
     const f = state.f;
     if (f.bean && r.beanName !== f.bean) return false;
-    if (f.variety && r.variety !== f.variety) return false;
+    if (f.variety && !parts(r.variety).includes(f.variety)) return false;
     if (f.roastery && r.roastery !== f.roastery) return false;
-    if (f.country && r.country !== f.country) return false;
-    if (f.farm && r.farm !== f.farm) return false;
-    if (f.process && r.process !== f.process) return false;
+    if (f.country && !parts(r.country).includes(f.country)) return false;
+    if (f.farm && !parts(r.farm).includes(f.farm)) return false;
+    if (f.process && !parts(r.process).includes(f.process)) return false;
     if (f.dripper && !(r.drippers||[]).includes(f.dripper)) return false;
     if (f.filter && r.filter !== f.filter) return false;
     if (f.level && r.roastLevel !== f.level) return false;

@@ -530,6 +530,9 @@ Samsung Notes에 가져오기 좋은 문서 형태로 만든다.
   (예: `Hario 02 콘 필터`, `HIFLUX Folding V02`). 린싱·주름 유지 같은 운용 메모는
   `filter`가 아니라 `equipment`의 필터 행에 적는다. 정식 이름이 아니면 빌드가 실패한다.
   새 장비가 생기면 이 목록과 레시피 북 `index.html`의 `OWNED_DRIPPERS`를 함께 고친다.
+- 블렌드처럼 값이 여러 개면 `country`, `farm`, `variety`, `process`에 쉼표로 나눠 적는다
+  (예: `"country": "Ethiopia, Peru"`, `"variety": "Heirloom, Geisha"`). 레시피 북이 쉼표·슬래시로
+  나눠 각각 칩으로 만들므로, 둘 중 하나만 골라도 레시피가 나온다. 각 값은 단일 원두와 같은 표기를 쓴다.
 - `country`, `farm`, `variety`, `process`, `roastery`는 표기를 통일한다
   (예: 항상 `Peru`, `Washed`, `Geisha`). 기존 `recipes/`의 표기를 먼저 확인하고 따른다.
 
