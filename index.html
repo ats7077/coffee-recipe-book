@@ -51,7 +51,13 @@
   .search input { flex: 1; border: 0; background: transparent; padding: 13px 0; font-size: 16px; outline: none; min-width: 0; }
   .search .clear { border: 0; background: none; color: var(--faint); font-size: 14px; padding: 6px; }
 
-  .filters { margin-top: 10px; display: grid; gap: 8px; }
+  .fwrap { margin-top: 8px; }
+  .fwrap summary { display: flex; align-items: center; gap: 8px; cursor: pointer; list-style: none; font-size: 13.5px; color: var(--dim); padding: 6px 2px; }
+  .fwrap summary::-webkit-details-marker { display: none; }
+  .fwrap summary::before { content: "▸"; color: var(--faint); }
+  .fwrap[open] summary::before { content: "▾"; }
+  .fwrap .fsum { color: var(--crema); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .filters { margin-top: 6px; display: grid; gap: 8px; max-height: 55vh; overflow-y: auto; overscroll-behavior: contain; }
   .frow { display: flex; align-items: center; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
   .frow::-webkit-scrollbar { display: none; }
   .frow.multi { display: grid; grid-template-columns: 52px 1fr; align-items: start; gap: 8px; overflow: visible; }
@@ -191,7 +197,10 @@
       <input id="q" type="search" placeholder="원두명, 품종, 컵노트, 드리퍼, 필터…" autocomplete="off" aria-label="레시피 검색">
       <button class="clear" id="qclear" hidden>지우기</button>
     </label>
-    <div class="filters" id="filters"></div>
+    <details class="fwrap" id="fwrap">
+      <summary><span>필터</span><span class="fsum" id="fsum"></span></summary>
+      <div class="filters" id="filters"></div>
+    </details>
   </div>
 
   <div class="count"><span id="count"></span><button id="reset" hidden>필터 초기화</button></div>
@@ -256,7 +265,14 @@
       state.f[k] = state.f[k] === v ? null : v;
       renderFilters(); renderList();
     }));
-    ["cmin","cmax"].forEach(id => $("#"+id).addEventListener("input", e => { state[id] = e.target.value.replace(/[^\d.]/g,""); renderList(); }));
+    ["cmin","cmax"].forEach(id => $("#"+id).addEventListener("input", e => { state[id] = e.target.value.replace(/[^\d.]/g,""); renderFsum(); renderList(); }));
+    renderFsum();
+  }
+  function renderFsum() {
+    const f = state.f;
+    const picked = Object.entries(f).filter(([,v]) => v).map(([k,v]) => k === "taste" ? TASTE_NAME[v] : k === "level" ? LEVEL_NAME[v] : v);
+    if (state.cmin || state.cmax) picked.push(`#${state.cmin || ""}~${state.cmax || ""}`);
+    $("#fsum").textContent = picked.length ? picked.join(" · ") : "";
   }
 
   function matches(r) {
