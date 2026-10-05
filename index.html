@@ -216,7 +216,7 @@
   <div class="d-wrap" id="dbody"></div>
 </section>
 
-<script src="data.js"></script>
+<script>document.write('<script src="data.js?t=' + Date.now() + '"><\/script>');</script>
 <script>
 (function () {
   const LEVELS = [["ultralight","울트라 라이트"],["light","라이트"],["medium","미디엄"],["dark","다크"]];
@@ -495,7 +495,7 @@
   function renderNotes() {
     const el = $("#nlist"); if (!el || !state.open) return;
     const ns = allNotes().filter(n => n.recipeId === state.open).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
-    el.innerHTML = ns.length ? ns.map(n => `<div class="note"><div class="nh"><span class="s">${"★".repeat(n.rating||0)}${"☆".repeat(5-(n.rating||0))}</span> ${esc(n.date)}${n._pending ? `<span class="pending">이 기기에만 저장됨</span>` : ""}<span class="nact"><button data-act="edit" data-id="${esc(n.id)}">수정</button><button data-act="del" data-id="${esc(n.id)}">삭제</button></span></div><div>${esc(n.memo)}</div></div>`).join("")
+    el.innerHTML = ns.length ? ns.map(n => `<div class="note"><div class="nh"><span class="s">${"★".repeat(n.rating||0)}${"☆".repeat(5-(n.rating||0))}</span> ${esc(n.date)}${n._pending ? `<span class="pending">${n._sentAt ? "보냄 · 반영 대기 중" : "이 기기에만 저장됨"}</span>` : ""}<span class="nact"><button data-act="edit" data-id="${esc(n.id)}">수정</button><button data-act="del" data-id="${esc(n.id)}">삭제</button></span></div><div>${esc(n.memo)}</div></div>`).join("")
       : `<p class="msg" style="margin-top:12px">아직 기록이 없어요. 내려 마신 뒤 평점과 메모를 남겨 두면, 다음 레시피를 만들 때 Claude가 참고할 수 있어요.</p>`;
   }
   async function saveNote() {
@@ -535,20 +535,25 @@
   function renderExport() {
     const p = loadPending();
     $("#exportbar").hidden = !p.length;
-    $("#exportmsg").textContent = `아직 보내지 않은 노트 변경 ${p.length}건`;
+    const unsent = p.filter(n => !n._sentAt).length;
+    $("#exportmsg").textContent = unsent ? `아직 보내지 않은 노트 변경 ${unsent}건`
+      : `보낸 노트 ${p.length}건을 반영하는 중이에요. 1~2분 뒤 새로고침하세요.`;
+    $("#sendbtn").textContent = unsent ? "GitHub로 보내기" : "다시 보내기";
   }
   // 대기 중인 노트를 본문에 담은 GitHub 이슈 작성 화면을 연다. Submit하면
   // .github/workflows/brew-note.yml이 notes/notes.json에 반영한다. 저장소를 옮기면 REPO를 고친다.
   const REPO = "ats7077/coffee-recipe-book";
   function sendPending() {
     const p = loadPending(); if (!p.length) return;
-    const body = "```json" + "\n" + JSON.stringify(p, null, 2) + "\n" + "```";
+    const body = "```json" + "\n" + JSON.stringify(p.map(({ _sentAt, ...n }) => n), null, 2) + "\n" + "```";
     window.open(`https://github.com/${REPO}/issues/new?title=${encodeURIComponent("brew-note " + p.length + "건")}&body=${encodeURIComponent(body)}`, "_blank", "noopener");
+    savePending(p.map(n => ({ ...n, _sentAt: n._sentAt || Date.now() })));
+    renderExport(); renderNotes();
     $("#exportmsg").textContent = "GitHub에서 Submit을 누르면 1~2분 뒤 반영돼요.";
   }
   $("#sendbtn").addEventListener("click", sendPending);
   $("#exportbtn").addEventListener("click", async () => {
-    const text = "브루 노트 변경을 notes/notes.json에 반영해줘:\n" + JSON.stringify(loadPending(), null, 2);
+    const text = "브루 노트 변경을 notes/notes.json에 반영해줘:\n" + JSON.stringify(loadPending().map(({ _sentAt, ...n }) => n), null, 2);
     try { await navigator.clipboard.writeText(text); $("#exportmsg").textContent = "복사했어요. Claude Code에 붙여 넣으세요."; }
     catch (_) {
       const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
